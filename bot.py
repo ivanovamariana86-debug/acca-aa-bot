@@ -924,8 +924,8 @@ def get_main_keyboard():
             InlineKeyboardButton("E · Заключение", callback_data="start_E"),
         ],
         [InlineKeyboardButton("🔬 D · Доказательства (отдельно)", callback_data="start_D")],
-        [InlineKeyboardButton("📊 Мой прогресс", callback_data="stats")],
-        [InlineKeyboardButton("📜 История ответов", callback_data="history")],
+        [InlineKeyboardButton("📊 Мой прогресс", callback_data="stats"), InlineKeyboardButton("📜 История", callback_data="history")],
+        [InlineKeyboardButton("📖 Повторить теорию", callback_data="theory_menu")],
     ])
 
 
@@ -953,9 +953,194 @@ def build_answer_keyboard(question_idx):
 def save_history(context, entry: str):
     history = context.user_data.setdefault("history", [])
     history.append(entry)
-    # Храним последние 50 записей
     if len(history) > 50:
         context.user_data["history"] = history[-50:]
+
+
+# ──────────────────────────────────────────────
+#  ТЕОРИЯ ПО БЛОКАМ
+# ──────────────────────────────────────────────
+THEORY = {
+    "A": """📚 *БЛОК A — Суть аудита и этика*
+
+*Что такое аудит?*
+Аудит — независимая проверка финансовой отчётности. Цель: выразить мнение о том, достоверна ли она. Аудит даёт *разумную уверенность* (reasonable assurance) — высокую, но не абсолютную.
+
+*Три стороны ассюранс-задания:*
+• Практик (practitioner) — аудитор
+• Ответственная сторона (responsible party) — менеджмент
+• Пользователи (intended users) — акционеры, банки
+
+*5 принципов этики ACCA:*
+1. Честность (Integrity) — прямолинейность и честность
+2. Объективность (Objectivity) — без предвзятости и конфликтов
+3. Профессиональная компетентность (Professional competence) — знания в актуальном состоянии
+4. Конфиденциальность (Confidentiality) — не раскрывать без разрешения
+5. Профессиональное поведение (Professional behaviour) — не дискредитировать профессию
+
+*5 угроз независимости:*
+• Самопроверка (Self-review) — проверяешь свою же работу
+• Личная заинтересованность (Self-interest) — акции клиента, высокий гонорар
+• Адвокация (Advocacy) — защищаешь клиента в суде
+• Близость (Familiarity) — слишком долгие отношения
+• Запугивание (Intimidation) — клиент угрожает
+
+*Пример:* Аудитор 10 лет работает с клиентом и думает «они честные» не проверяя доказательства = угроза близости (familiarity threat).
+
+*Внутренний vs внешний аудит:*
+Внутренний — сотрудник компании, отвечает менеджменту.
+Внешний — независим, назначается акционерами, цель — мнение об отчётности.
+
+*Независимость:* independence of mind + independence in appearance. Оба вида обязательны.
+
+*Профессиональный скептицизм* — критически оценивай доказательства, ищи подтверждения, не верь слепо менеджменту.""",
+
+    "B": """📚 *БЛОК B — Риски и планирование*
+
+*Модель аудиторского риска:*
+AR = IR × CR × DR
+• IR — Неотъемлемый риск (Inherent risk) — риск по природе операций
+• CR — Риск контроля (Control risk) — контроли не работают
+• DR — Риск необнаружения (Detection risk) — аудитор не найдёт ошибку
+
+Аудитор управляет только DR — через объём и характер процедур.
+
+*Пример:* Высокий IR + низкий CR (контроли работают) → DR можно повысить → меньше процедур. Высокий IR + высокий CR → DR снижать → больше процедур.
+
+*Существенность (Materiality):*
+Порог выше которого ошибка влияет на решения пользователей.
+База: % от выручки, прибыли или активов.
+Существенность исполнения (Performance materiality) — ниже общей, буфер против накопления мелких ошибок.
+
+*Going concern* — компания будет работать ≥12 месяцев.
+Признаки угрозы: убытки, отрицательный денежный поток, нарушение ковенантов, отказ банка в кредите.
+
+*Треугольник мошенничества (Fraud triangle):*
+Давление (Pressure) + Возможность (Opportunity) + Оправдание (Rationalisation)
+
+*2 типа мошенничества:*
+• Мошеннические финансовые отчёты (Fraudulent financial reporting) — менеджмент искажает отчётность
+• Присвоение активов (Misappropriation of assets) — сотрудники крадут
+
+*Красные флаги:* давление на аудитора, резкий рост выручки в Q4, доминирующий директор без надзора совета, высокая текучесть в бухгалтерии.
+
+*Аналитические процедуры* применяются на 3 этапах:
+1. Планирование — выявить риски
+2. По существу — как процедура по существу
+3. Завершение — финальный обзор согласованности""",
+
+    "C": """📚 *БЛОК C — Внутренний контроль*
+
+*Цель контроля:* разумная уверенность (reasonable assurance) — не абсолютная!
+
+*Почему не абсолютная:*
+• Сговор сотрудников (Collusion)
+• Обход руководством (Management override) — главный риск!
+• Человеческая ошибка
+
+*5 компонентов контроля (COSO):*
+1. Среда контроля (Control environment) — тон сверху, этика, культура
+2. Оценка рисков (Risk assessment)
+3. Контрольные процедуры (Control activities)
+4. Информация и коммуникации
+5. Мониторинг (Monitoring)
+
+*Виды контролей:*
+• Превентивные (Preventive) — предотвращают ДО: авторизация, пароли
+• Детективные (Detective) — обнаруживают ПОСЛЕ: сверки, внутренний аудит
+
+*Разделение обязанностей (Segregation of duties):*
+Один человек не должен авторизовывать + выполнять + записывать одну операцию.
+Пример: кто заказывает товар — не должен его оплачивать.
+
+*IT-контроли:*
+Общие (General IT controls): доступ, управление изменениями, резервное копирование.
+Контроли приложений (Application controls): проверка ввода, расчёты, отчёты об исключениях.
+Общие IT-контроли — фундамент. Если они слабые — контролям приложений нельзя доверять.
+
+*Ключевые контроли в системах:*
+Закупки: авторизация заказов + трёхстороннее сопоставление (PO + GRN + счёт) + разделение закупки и оплаты.
+Продажи: авторизация кредитных лимитов + нумерация счетов + ежемесячные выписки клиентам.
+Зарплата: авторизация изменений данных + разделение расчёта и выплаты + контроль ghost employees.
+
+*Тесты контроля (Tests of controls):*
+Проверяют что контроли РАБОТАЛИ в течение всего периода. Если работают — можно сократить процедуры по существу.""",
+
+    "D": """📚 *БЛОК D — Аудиторские доказательства*
+
+*Надёжность доказательств (от высокой к низкой):*
+1. Внешние от третьих лиц напрямую аудитору (банковское подтверждение) — самые надёжные
+2. Внешние документы от клиента (счета поставщиков)
+3. Внутренние документы клиента (накладные, договоры)
+4. Устные заявления менеджмента — наименее надёжные
+
+*7 утверждений (Assertions):*
+Для операций: Occurrence (реальность), Completeness (полнота), Accuracy (точность), Cut-off (срез), Classification (классификация).
+Для остатков: Existence (существование), Rights (права), Completeness (полнота), Valuation (оценка).
+
+*Направленное тестирование:*
+Активы → риск завышения → тест сверху вниз (из отчётности к документу) → проверяем Existence.
+Обязательства → риск занижения → тест снизу вверх (от документа к отчётности) → проверяем Completeness.
+
+*Пример cut-off:* товар отгружен 4 января, но записан 31 декабря = нарушение среза, завышение выручки.
+
+*Процедуры по существу (Substantive procedures):*
+• Аналитические процедуры (Analytical procedures) — сравнение цифр, коэффициентов
+• Детальные тесты (Tests of detail) — проверка конкретных документов
+
+*5 методов получения доказательств:*
+• Инспекция (Inspection) — проверка документов и активов
+• Наблюдение (Observation) — наблюдение за процессом (инвентаризация)
+• Запрос (Inquiry) — сам по себе недостаточен, нужно подкрепление!
+• Внешнее подтверждение (External confirmation) — от банка, дебиторов напрямую
+• Пересчёт (Recalculation) — проверка арифметики
+
+*Аудит ключевых статей:*
+Запасы: наблюдение за инвентаризацией + проверка cost vs NRV.
+Дебиторка: circularisation + анализ возраста + последующие поступления.
+Кредиторка: сверка с выписками поставщиков + поиск незарегистрированных обязательств.
+Выручка: аналитика (цена × объём) + тесты на occurrence и completeness.
+
+*Аудиторская выборка (Audit sampling):* результаты выборки распространяются на всю совокупность. Риск выборки — вывод может не совпасть с реальностью 100% проверки.""",
+
+    "E": """📚 *БЛОК E — Аудиторское заключение*
+
+*4 вида заключений:*
+1. Немодифицированное (Unmodified) — отчётность достоверна ✅
+2. С оговоркой (Qualified) — искажение существенно НО не повсеместно
+3. Отрицательное (Adverse) — искажение существенно И повсеместно
+4. Отказ от мнения (Disclaimer) — не могу получить доказательства, повсеместное влияние
+
+*Ключевое слово: PERVASIVE (повсеместный)*
+Не повсеместно → Qualified
+Повсеместно + искажение → Adverse
+Повсеместно + нет доказательств → Disclaimer
+
+*Дополнительные параграфы:*
+Emphasis of Matter — вопрос УЖЕ раскрыт в отчётности, аудитор привлекает внимание (пример: going concern). Мнение НЕ меняется.
+Other Matter — вопрос НЕ в отчётности, но важен для понимания аудита. Мнение НЕ меняется.
+
+*Going concern в заключении:*
+Адекватно раскрыта → Unmodified + Emphasis of Matter
+Не раскрыта, но проблема есть → Qualified или Adverse (в зависимости от повсеместности)
+
+*KAM (Key Audit Matters):*
+Наиболее значимые вопросы аудита. Обязательны только для листинговых компаний (listed entities).
+
+*Последующие события (Subsequent events):*
+Корректирующие (Adjusting) — подтверждают условия НА отчётную дату → изменить отчётность.
+Пример: банкротство дебитора в феврале, если он был неплатёжеспособен уже 31 декабря.
+Некорректирующие (Non-adjusting) — условия возникли ПОСЛЕ → только раскрытие в примечаниях.
+Пример: пожар на заводе в январе.
+
+*Ответственность:*
+Менеджмент — за подготовку отчётности и систему контроля.
+Аудитор — за мнение на основе аудита по стандартам.
+
+*True and fair view* — отчётность правдиво (true) и не вводит в заблуждение (fair) отражает финансовое положение компании.""",
+
+    "ALL": None
+}
 
 
 def init_session(context, mode):
@@ -1016,17 +1201,31 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         mode = data.split("_")[1]
         init_session(context, mode)
         s = context.user_data["session"]
-        context.user_data["stats"] = context.user_data.get("stats", {"correct": 0, "wrong": 0, "sessions": 0})
-        context.user_data["stats"]["sessions"] += 1
-        await query.edit_message_text(
-            f"✅ Режим: *{BLOCK_NAMES[mode]}*\n"
-            f"Вопросов: *{s['total']}*\n\n"
-            "Поехали! 🚀",
-            parse_mode="Markdown",
-            reply_markup=InlineKeyboardMarkup([[
-                InlineKeyboardButton("▶️ Начать", callback_data="next")
-            ]])
-        )
+        context.user_data.setdefault("stats", {"correct": 0, "wrong": 0, "sessions": 0})["sessions"] = \
+            context.user_data["stats"].get("sessions", 0) + 1
+
+        # Показываем теорию только если блок не ALL и первый раз
+        seen_key = f"theory_seen_{mode}"
+        theory_text = THEORY.get(mode)
+        if theory_text and not context.user_data.get(seen_key):
+            context.user_data[seen_key] = True
+            await query.edit_message_text(
+                theory_text + f"\n\n─────────────\n📝 Вопросов в блоке: *{s['total']}*\nПрочитай конспект и нажми кнопку!",
+                parse_mode="Markdown",
+                reply_markup=InlineKeyboardMarkup([[
+                    InlineKeyboardButton("✅ Понятно — начать тесты!", callback_data="next")
+                ]])
+            )
+        else:
+            await query.edit_message_text(
+                f"✅ Режим: *{BLOCK_NAMES[mode]}*\n"
+                f"Вопросов: *{s['total']}*\n\n"
+                "Поехали! 🚀",
+                parse_mode="Markdown",
+                reply_markup=InlineKeyboardMarkup([[
+                    InlineKeyboardButton("▶️ Начать", callback_data="next")
+                ]])
+            )
         return
 
     # ── NEXT QUESTION ──
@@ -1162,6 +1361,36 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
+    # ── THEORY MENU ──
+    if data == "theory_menu":
+        await query.edit_message_text(
+            "📖 *Какой блок повторить?*",
+            parse_mode="Markdown",
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("A · Суть аудита и этика", callback_data="theory_A")],
+                [InlineKeyboardButton("B · Риски и планирование", callback_data="theory_B")],
+                [InlineKeyboardButton("C · Внутренний контроль", callback_data="theory_C")],
+                [InlineKeyboardButton("D · Доказательства", callback_data="theory_D")],
+                [InlineKeyboardButton("E · Заключение аудитора", callback_data="theory_E")],
+                [InlineKeyboardButton("⬅️ Назад", callback_data="menu")],
+            ])
+        )
+        return
+
+    if data.startswith("theory_") and data != "theory_menu":
+        block = data.split("_")[1]
+        theory_text = THEORY.get(block, "Теория не найдена")
+        # Сбросить флаг чтобы теория снова показалась при следующем запуске блока
+        context.user_data[f"theory_seen_{block}"] = False
+        await query.edit_message_text(
+            theory_text,
+            parse_mode="Markdown",
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("⬅️ Назад", callback_data="theory_menu")
+            ]])
+        )
+        return
+
     # ── MENU ──
     if data == "menu":
         await query.edit_message_text(
@@ -1199,4 +1428,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
