@@ -1185,19 +1185,6 @@ async def history_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = "📜 *Твоя история ответов (последние):*\n\n"
     text += "\n\n".join(history[-10:])
     await update.message.reply_text(text, parse_mode="Markdown")
-    text = (
-        "⏰ *Напоминание от твоего ACCA AA тренажёра!*\n\n"
-        "Прошло 2 недели — пора добавить новые вопросы в бота! 📚\n\n"
-        "Что сделать:\n"
-        "1. Напиши мне в Claude — я добавлю новые вопросы\n"
-        "2. Вставь код в GitHub → бот обновится автоматически\n\n"
-        "Не останавливайся — ты молодец! 💪"
-    )
-    await context.bot.send_message(
-        chat_id=ADMIN_ID,
-        text=text,
-        parse_mode="Markdown"
-    )
 
 
 def main():
