@@ -1201,8 +1201,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         mode = data.split("_")[1]
         init_session(context, mode)
         s = context.user_data["session"]
-        context.user_data.setdefault("stats", {"correct": 0, "wrong": 0, "sessions": 0})["sessions"] = \
-            context.user_data["stats"].get("sessions", 0) + 1
+        stats = context.user_data.setdefault("stats", {"correct": 0, "wrong": 0, "sessions": 0})
+        stats["sessions"] = stats.get("sessions", 0) + 1
 
         # Показываем теорию только если блок не ALL и первый раз
         seen_key = f"theory_seen_{mode}"
